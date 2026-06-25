@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   build:
@@ -23,17 +24,17 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Initialize and Rebuild Project Structure
+      - name: Create Fresh Flutter Project Structure
         run: |
-          # پاکسازی کامل پوشه اندروید قدیمی برای رفع هرگونه ارور کانفیگ
-          rm -rf android
-          # ساخت مجدد ساختار استاندارد اندروید بدون دستکاری پوشه lib
-          flutter create . --platforms android --overwrite
+          # پاک کردن هر چیزی که از قبل بوده برای جلوگیری از تداخل کانفیگ
+          rm -rf * .github
+          
+          # ساخت یک پروژه فلاتر کاملاً نو، تازه و استاندارد در پوشه فعلی
+          flutter create --platforms android --org com.example.ioslauncher --project-name ios_launcher .
 
       - name: Inject Final iOS Launcher Code
         run: |
-          # این بخش تضمین می‌کند کد لانچر آیفون شما با کدهای پیش‌فرض فلاتر جایگزین نشود
-          mkdir -p lib
+          # نوشتن مستقیم کد لانچر آیفون انگلیسی درون فایل اصلی پروژه
           cat << 'EOF' > lib/main.dart
           import 'dart:ui';
           import 'package:flutter/material.dart';
