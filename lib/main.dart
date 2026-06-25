@@ -1,0 +1,470 @@
+import 'dart:ui';
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const IOSLauncherApp());
+}
+
+class IOSLauncherApp extends StatelessWidget {
+  const IOSLauncherApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'iOS Launcher 2026',
+      theme: ThemeData(
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: Colors.black,
+        useMaterial3: true,
+      ),
+      home: const MainContainer(),
+    );
+  }
+}
+
+class MainContainer extends StatefulWidget {
+  const MainContainer({super.key});
+
+  @override
+  State<MainContainer> createState() => _MainContainerState();
+}
+
+class _MainContainerState extends State<MainContainer> {
+  bool isLocked = true; // Starts on the iOS Lock Screen
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          // Premium iOS Wallpaper
+          Positioned.fill(
+            child: Image.network(
+              'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe',
+              fit: BoxFit.cover,
+            ),
+          ),
+
+          // Switch between Lock Screen and Home Screen
+          isLocked
+              ? LockScreen(onUnlock: () => setState(() => isLocked = false))
+              : const HomeScreen(),
+        ],
+      ),
+    );
+  }
+}
+
+// --- iOS Lock Screen ---
+class LockScreen extends StatelessWidget {
+  final VoidCallback onUnlock;
+  const LockScreen({super.key, required this.onUnlock});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.black.withOpacity(0.25),
+      child: SafeArea(
+        child: Column(
+          children: [
+            const SizedBox(height: 50),
+            const Icon(Icons.lock_outline, color: Colors.white, size: 28),
+            const SizedBox(height: 12),
+            const Text(
+              '09:41',
+              style: TextStyle(fontSize: 80, fontWeight: FontWeight.w200, color: Colors.white),
+            ),
+            const Text(
+              'Thursday, June 25',
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w400, color: Colors.white70),
+            ),
+            const Spacer(),
+            // Unlock Button
+            GestureDetector(
+              onTap: onUnlock,
+              child: Container(
+                margin: const EdgeInsets.bottom(50),
+                padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 14),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(color: Colors.white12),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('Tap to Unlock ', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500)),
+                    Icon(Icons.arrow_forward_ios, color: Colors.white, size: 14),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// --- iOS Home Screen with Dynamic Island & Control Center ---
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  bool isIslandExpanded = false;
+  bool isControlCenterOpen = false;
+  double brightnessValue = 0.6;
+  double volumeValue = 0.4;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        // Main Home Screen Layout
+        SafeArea(
+          child: Column(
+            children: [
+              // Top Status Bar (Tap Right Side to Open Control Center)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 6),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text('9:41', style: TextStyle(navigator: null, fontWeight: FontWeight.bold, fontSize: 15)),
+                    GestureDetector(
+                      onTap: () => setState(() => isControlCenterOpen = true),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.signal_cellular_alt, size: 18),
+                          SizedBox(width: 6),
+                          Icon(Icons.wifi, size: 18),
+                          SizedBox(width: 6),
+                          Icon(Icons.battery_full, color: Colors.green, size: 18),
+                          SizedBox(width: 4),
+                          Text('85%', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 4),
+
+              // 🏝️ Animated Dynamic Island Widget
+              GestureDetector(
+                onTap: () => setState(() => isIslandExpanded = !isIslandExpanded),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 320),
+                  curve: Curves.fastOutSlowIn,
+                  width: isIslandExpanded ? MediaQuery.of(context).size.width * 0.92 : 115,
+                  height: isIslandExpanded ? 75 : 28,
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  child: isIslandExpanded ? _buildExpandedIsland() : _buildCompactIsland(),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Grid of Apps
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: GridView.count(
+                    crossAxisCount: 4,
+                    mainAxisSpacing: 22,
+                    crossAxisSpacing: 16,
+                    physics: const NeverScrollableScrollPhysics(),
+                    children: [
+                      _buildAppIcon(Icons.camera_alt, 'Camera', Colors.grey),
+                      _buildAppIcon(Icons.settings, 'Settings', Colors.blueGrey),
+                      _buildAppIcon(Icons.mail, 'Mail', Colors.blue),
+                      _buildAppIcon(Icons.map, 'Maps', Colors.green),
+                      _buildAppIcon(Icons.music_note, 'Music', Colors.pink),
+                      _buildAppIcon(Icons.wallet, 'Wallet', Colors.indigo),
+                      _buildAppIcon(Icons.edit_note, 'Notes', Colors.amber),
+                      _buildAppIcon(Icons.photo_library, 'Photos', Colors.orange),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Bottom Glassmorphic Dock
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(32),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+                      color: Colors.white.withOpacity(0.18),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _buildDockIcon(Icons.phone, Colors.green),
+                          _buildDockIcon(Icons.message, Colors.lightBlue),
+                          _buildDockIcon(Icons.web, Colors.blue),
+                          _buildDockIcon(Icons.chat, Colors.teal),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // 🎛️ Control Center Overlay Layer (Slides Down)
+        AnimatedPositioned(
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.fastOutSlowIn,
+          top: isControlCenterOpen ? 0 : -MediaQuery.of(context).size.height,
+          left: 0,
+          right: 0,
+          height: MediaQuery.of(context).size.height * 0.78,
+          child: _buildControlCenter(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCompactIsland() {
+    return const Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Icon(Icons.lens, color: Colors.green, size: 9),
+        Icon(Icons.bolt, color: Colors.amber, size: 12),
+      ],
+    );
+  }
+
+  Widget _buildExpandedIsland() {
+    return const Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            Icon(Icons.music_note, color: Colors.pink, size: 28),
+            SizedBox(width: 10),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Now Playing', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white)),
+                Text('iOS Concept 2026', style: TextStyle(color: Colors.white60, fontSize: 11)),
+              ],
+            ),
+          ],
+        ),
+        Icon(Icons.bar_chart, color: Colors.green, size: 22),
+      ],
+    );
+  }
+
+  // Glassmorphic Control Center UI
+  Widget _buildControlCenter() {
+    return ClipRRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+        child: Container(
+          color: Colors.black.withOpacity(0.6),
+          padding: const EdgeInsets.fromLTRB(24, 60, 24, 20),
+          child: Column(
+            children: [
+              // Connections and Music Player
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      height: 140,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      padding: const EdgeInsets.all(12),
+                      child: GridView.count(
+                        crossAxisCount: 2,
+                        mainAxisSpacing: 12,
+                        crossAxisSpacing: 12,
+                        physics: const NeverScrollableScrollPhysics(),
+                        children: [
+                          _buildControlIcon(Icons.wifi, Colors.blue, true),
+                          _buildControlIcon(Icons.bluetooth, Colors.blue, true),
+                          _buildControlIcon(Icons.flight, Colors.orange, false),
+                          _buildControlIcon(Icons.signal_cellular_alt, Colors.green, true),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Container(
+                      height: 140,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      padding: const EdgeInsets.all(16),
+                      child: const Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Not Playing', style: TextStyle(color: Colors.white60, fontSize: 12)),
+                          SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Icon(Icons.skip_previous, size: 26),
+                              Icon(Icons.play_arrow, size: 32),
+                              Icon(Icons.skip_next, size: 26),
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              
+              // Vertical Sliders for Brightness & Volume
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildVerticalSlider(Icons.wb_sunny, 'Brightness', brightnessValue, (val) {
+                      setState(() => brightnessValue = val);
+                    }),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _buildVerticalSlider(Icons.volume_up, 'Volume', volumeValue, (val) {
+                      setState(() => volumeValue = val);
+                    }),
+                  ),
+                ],
+              ),
+              
+              const Spacer(),
+              // Bottom Handle to Close Control Center
+              GestureDetector(
+                onTap: () => setState(() => isControlCenterOpen = false),
+                child: Column(
+                  children: [
+                    const Text('Close Menu', style: TextStyle(color: Colors.white38, fontSize: 12)),
+                    const SizedBox(height: 6),
+                    Container(
+                      width: 65,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        color: Colors.white38,
+                        borderRadius: BorderRadius.circular(2.5),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildControlIcon(IconData icon, Color activeColor, bool isActive) {
+    return Container(
+      decoration: BoxDecoration(
+        color: isActive ? activeColor : Colors.white12,
+        shape: BoxShape.circle,
+      ),
+      child: Icon(icon, color: Colors.white, size: 20),
+    );
+  }
+
+  Widget _buildVerticalSlider(IconData icon, String label, double value, ValueChanged<double> onChanged) {
+    return Column(
+      children: [
+        Container(
+          height: 140,
+          width: 75,
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.12),
+            borderRadius: BorderRadius.circular(22),
+          ),
+          child: Stack(
+            alignment: Alignment.bottomCenter,
+            children: [
+              FractionallySizedBox(
+                heightFactor: value,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.25),
+                    borderRadius: BorderRadius.circular(22),
+                  ),
+                ),
+              ),
+              Positioned.fill(
+                child: SliderTheme(
+                  data: SliderThemeData(
+                    trackHeight: 140,
+                    thumbShape: SliderComponentShape.noThumb,
+                    overlayShape: SliderComponentShape.noOverlay,
+                    activeTrackColor: Colors.transparent,
+                    inactiveTrackColor: Colors.transparent,
+                  ),
+                  child: RotatedBox(
+                    quarterTurns: 3,
+                    child: Slider(value: value, onChanged: onChanged),
+                  ),
+                ),
+              ),
+              Positioned(bottom: 12, child: Icon(icon, color: Colors.white70, size: 22)),
+            ],
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(label, style: const TextStyle(color: Colors.white60, fontSize: 12)),
+      ],
+    );
+  }
+
+  Widget _buildAppIcon(IconData icon, String label, Color bgColor) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 60,
+          height: 60,
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Icon(icon, color: Colors.white, size: 28),
+        ),
+        const SizedBox(height: 6),
+        Text(label, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w400), overflow: TextOverflow.ellipsis),
+      ],
+    );
+  }
+
+  Widget _buildDockIcon(IconData icon, Color bgColor) {
+    return Container(
+      width: 60,
+      height: 60,
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Icon(icon, color: Colors.white, size: 30),
+    );
+  }
+}
