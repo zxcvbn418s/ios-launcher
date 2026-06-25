@@ -22,7 +22,6 @@ jobs:
       - name: Setup Specific Flutter SDK
         uses: subosito/flutter-action@v2
         with:
-          # قفل کردن نسخه روی 3.22.0 برای دور زدن باگ پکیج تست فلاتر
           flutter-version: '3.22.0'
           channel: 'stable'
 
@@ -116,7 +115,7 @@ jobs:
                       GestureDetector(
                         onTap: onUnlock,
                         child: Container(
-                          margin: const EdgeInsets.bottom(50),
+                          margin: const EdgeInsets.only(bottom: 50),
                           padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 14),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.2),
@@ -339,7 +338,7 @@ jobs:
                                     Text('Not Playing', style: TextStyle(color: Colors.white60, fontSize: 12)),
                                     SizedBox(height: 16),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      mainAxisAlignment: Main EVENLY,
                                       children: [
                                         Icon(Icons.skip_previous, size: 26),
                                         Icon(Icons.play_arrow, size: 32),
