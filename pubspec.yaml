@@ -1,20 +1,20 @@
 name: ios_launcher
-description: "A premium iOS launcher built with Flutter"
+description: "A beautiful Liquid Glass iOS Launcher built with Flutter in 2026."
 publish_to: 'none'
-
-version: 1.0.0+1
+version: 1.0.1+8
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: '>=3.4.0 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
+  cupertino_icons: ^1.0.8
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^3.0.0
+  flutter_lints: ^4.0.0
 
 flutter:
   uses-material-design: true
