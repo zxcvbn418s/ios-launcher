@@ -6,10 +6,6 @@ on:
       - main
   workflow_dispatch:
 
-permissions:
-  contents: write
-  packages: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -221,7 +217,7 @@ jobs:
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                       child: Row(
-                        mainAxisAlignment: Main=\nt.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text('9:41', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.white)),
                           GestureDetector(
@@ -580,7 +576,7 @@ jobs:
       - name: Build Application Binary APK
         run: flutter build apk --release
 
-      - name: Direct Upload to Actions Artifacts (Visible at Bottom)
+      - name: Safe Upload directly to Actions Artifacts (ZIP Mode)
         uses: actions/upload-artifact@v4
         with:
           name: GlassLauncher-Production-Build
