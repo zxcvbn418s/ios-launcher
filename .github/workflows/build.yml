@@ -6,6 +6,11 @@ on:
       - main
   workflow_dispatch:
 
+# اعطای دسترسی‌های لازم به توکن گیت‌هاب برای حل قطعی خطای 403 Resource not accessible
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,7 +30,7 @@ jobs:
           flutter-version: '3.22.0'
           channel: 'stable'
 
-      - name: Recreate Android Project
+      - name: Recreate Android Project Safely
         run: |
           rm -rf android
           flutter create --platforms android --org com.liquid.glasslauncher --project-name glass_launcher .
@@ -36,7 +41,7 @@ jobs:
           name: glass_launcher
           description: "A Professional Production Liquid Glass iOS Launcher"
           publish_to: 'none'
-          version: 1.0.0+1
+          version: 1.0.2+10
 
           environment:
             sdk: '>=3.0.0 <4.0.0'
@@ -56,7 +61,7 @@ jobs:
             uses-material-design: true
           EOF
 
-      - name: Inject Full Functional Launcher Source Code
+      - name: Inject Full Liquid Glass Core Source Code
         run: |
           rm -f lib/main.dart
           mkdir -p lib
@@ -78,7 +83,7 @@ jobs:
             Widget build(BuildContext context) {
               return MaterialApp(
                 debugShowCheckedModeBanner: false,
-                title: 'Liquid Glass Launcher',
+                title: 'Liquid Glass Launcher 2026',
                 theme: ThemeData(
                   brightness: Brightness.dark,
                   scaffoldBackgroundColor: Colors.black,
@@ -108,15 +113,11 @@ jobs:
             @override
             void initState() {
               super.initState();
-              _requestPermissionsAndLoadApps();
+              _loadAppsAndPermissions();
             }
 
-            Future<void> _requestPermissionsAndLoadApps() async {
+            Future<void> _loadAppsAndPermissions() async {
               await Permission.ignoreBatteryOptimizations.request();
-              _loadApps();
-            }
-
-            Future<void> _loadApps() async {
               try {
                 List<Application> apps = await DeviceApps.getInstalledApplications(
                   includeSystemApps: true,
@@ -138,7 +139,7 @@ jobs:
               return Scaffold(
                 body: Stack(
                   children: [
-                    // Dynamic Liquid Wallpaper Gradient Background
+                    // والپیپر گرادیان نئونی تیره - کاملاً منطبق با سبک Liquid Glass Foundation
                     Positioned.fill(
                       child: Container(
                         decoration: const BoxDecoration(
@@ -146,24 +147,22 @@ jobs:
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                             colors: [
-                              Color(0xFF161726),
-                              Color(0xFF112136),
-                              Color(0xFF1D1429),
-                              Color(0xFF07080C),
+                              Color(0xFF0F101A),
+                              Color(0xFF141A29),
+                              Color(0xFF1B1224),
+                              Color(0xFF07070A),
                             ],
                           ),
                         ),
                       ),
                     ),
 
-                    // Main Operational Navigation Flow
-                    _isLocked 
-                      ? _buildLockScreen() 
-                      : _buildMainWorkspace(),
+                    // ساختار اصلی صفحات بر اساس شات تایید شده
+                    _isLocked ? _buildLockScreen() : _buildMainWorkspace(),
 
-                    // Slidably Accessible Control Center Overlay
+                    // کنترل سنتر کشویی فوق لوکس شیشه‌ای مایع
                     AnimatedPositioned(
-                      duration: const Duration(milliseconds: 380),
+                      duration: const Duration(milliseconds: 400),
                       curve: Curves.fastOutSlowIn,
                       top: _isControlCenterOpen ? 0 : -MediaQuery.of(context).size.height,
                       left: 0,
@@ -190,30 +189,28 @@ jobs:
                   child: SafeArea(
                     child: Column(
                       children: [
-                        const SizedBox(height: 50),
-                        const Icon(Icons.lock_outline, color: Colors.white, size: 28),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 60),
+                        const Icon(Icons.lock_open_rounded, color: Colors.white70, size: 26),
+                        const SizedBox(height: 16),
                         const Text(
                           '09:41',
-                          style: TextStyle(fontSize: 86, fontWeight: FontWeight.w200, color: Colors.white, letterSpacing: -2),
+                          style: TextStyle(fontSize: 88, fontWeight: FontWeight.w200, color: Colors.white, letterSpacing: -2),
                         ),
                         const Text(
                           'Sunday, June 28',
                           style: TextStyle(fontSize: 22, fontWeight: FontWeight.w400, color: Colors.white70),
                         ),
                         const Spacer(),
-                        Container(
-                          margin: const EdgeInsets.only(bottom: 40),
-                          child: Column(
-                            children: [
-                              const Icon(Icons.keyboard_arrow_up, color: Colors.white60, size: 30),
-                              Text(
-                                'Swipe up to open',
-                                style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 16, fontWeight: FontWeight.w500),
-                              ),
-                            ],
-                          ),
+                        Column(
+                          children: [
+                            const Icon(Icons.keyboard_arrow_up_rounded, color: Colors.white60, size: 32),
+                            Text(
+                              'Swipe up to unlock',
+                              style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 15, fontWeight: FontWeight.w500, letterSpacing: 0.5),
+                            ),
+                          ],
                         ),
+                        const SizedBox(height: 50),
                       ],
                     ),
                   ),
@@ -225,24 +222,24 @@ jobs:
               return SafeArea(
                 child: Column(
                   children: [
-                    // Persistent Custom System Top Bar
+                    // استاتوس بار اختصاصی با قابلیت باز کردن کنترل سنتر با ضربه
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 6),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('9:41', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                          const Text('9:41', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.white)),
                           GestureDetector(
                             onTap: () => setState(() => _isControlCenterOpen = true),
                             child: const Row(
                               children: [
-                                Icon(Icons.signal_cellular_alt, size: 18),
-                                SizedBox(width: 6),
-                                Icon(Icons.wifi, size: 18),
-                                SizedBox(width: 6),
-                                Icon(Icons.battery_full, color: Colors.green, size: 18),
+                                Icon(Icons.signal_cellular_alt_rounded, size: 17, color: Colors.white),
+                                SizedBox(width: 5),
+                                Icon(Icons.wifi_rounded, size: 17, color: Colors.white),
+                                SizedBox(width: 5),
+                                Icon(Icons.battery_full_rounded, color: Colors.greenAccent, size: 18),
                                 SizedBox(width: 4),
-                                Text('85%', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                                Text('85%', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white)),
                               ],
                             ),
                           ),
@@ -250,65 +247,66 @@ jobs:
                       ),
                     ),
 
-                    // Interactive Dynamic Island System
+                    // داینامیک آیلند فعال متصل به موزیک پلیر فرضی بر اساس شات لوکس
                     GestureDetector(
                       onTap: () => setState(() => _isIslandExpanded = !_isIslandExpanded),
                       child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 320),
+                        duration: const Duration(milliseconds: 350),
                         curve: Curves.fastOutSlowIn,
-                        width: _isIslandExpanded ? MediaQuery.of(context).size.width * 0.92 : 110,
-                        height: _isIslandExpanded ? 75 : 30,
+                        width: _isIslandExpanded ? MediaQuery.of(context).size.width * 0.92 : 120,
+                        height: _isIslandExpanded ? 80 : 32,
                         decoration: BoxDecoration(
                           color: Colors.black,
                           borderRadius: BorderRadius.circular(24),
+                          border: Border.all(color: Colors.white.withOpacity(0.05)),
                         ),
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                         child: _isIslandExpanded ? _expandedIslandContent() : _compactIslandContent(),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
 
-                    // Horizontal Paged Grid System
+                    // پیاده‌سازی سیستم چند صفحه‌ای شامل صفحه ویجت تایید شده و صفحه کل برنامه‌ها
                     Expanded(
                       child: PageView(
                         controller: _pageController,
                         onPageChanged: (int page) => setState(() => _currentPage = page),
                         children: [
-                          _buildWidgetPageLayout(), // Page 1: Glassmorphic Widgets Screen
-                          _buildProductionAppGrid(), // Page 2: Real System Applications Organizer
+                          _buildUnifiedMainScreen(), // صفحه تلفیقی ویجت بزرگ لوکس (شات ارسالی شما)
+                          _buildProductionAppGrid(),  // صفحه آیکون برنامه‌های واقعی گوشی شما
                         ],
                       ),
                     ),
 
-                    // Page Position Pagination Indicators
+                    // نشانگر نقاط صفحات سفارشی شده
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(2, (index) => AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        width: _currentPage == index ? 16 : 8,
+                        duration: const Duration(milliseconds: 250),
+                        margin: const EdgeInsets.symmetric(horizontal: 5),
+                        width: _currentPage == index ? 20 : 8,
                         height: 8,
                         decoration: BoxDecoration(
-                          color: _currentPage == index ? Colors.white : Colors.white30,
+                          color: _currentPage == index ? Colors.white : Colors.white24,
                           borderRadius: BorderRadius.circular(4),
                         ),
                       )),
                     ),
                     const SizedBox(height: 12),
 
-                    // Bottom Permanent Glass Dock Area
+                    // داک شیشه‌ای مایع مایع (Liquid Glass Dock) پایین صفحه با بلر غلیظ
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(30),
+                        borderRadius: BorderRadius.circular(32),
                         child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+                          filter: ImageFilter.blur(sigmaX: 35, sigmaY: 35),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+                            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.07),
-                              borderRadius: BorderRadius.circular(30),
-                              border: Border.all(color: Colors.white.withOpacity(0.15)),
+                              color: Colors.white.withOpacity(0.06),
+                              borderRadius: BorderRadius.circular(32),
+                              border: Border.all(color: Colors.white.withOpacity(0.18)),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -327,8 +325,8 @@ jobs:
               return const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Icon(Icons.lens, color: Colors.green, size: 7),
-                  Icon(Icons.bolt, color: Colors.amber, size: 11),
+                  Icon(Icons.lens, color: Colors.lightGreenAccent, size: 6),
+                  Icon(Icons.bolt, color: Colors.amberAccent, size: 12),
                 ],
               );
             }
@@ -339,62 +337,69 @@ jobs:
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.radio, color: Colors.deepOrangeAccent, size: 28),
+                      Icon(Icons.music_note_rounded, color: Colors.pinkAccent, size: 28),
                       SizedBox(width: 12),
                       Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('System Operational', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white)),
-                          Text('Liquid Glass Active', style: TextStyle(color: Colors.white60, fontSize: 11)),
+                          Text('Obsidian Echoes', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white)),
+                          Text('Music Form - Now Playing', style: TextStyle(color: Colors.white60, fontSize: 11)),
                         ],
                       ),
                     ],
                   ),
-                  Icon(Icons.bar_chart, color: Colors.greenAccent, size: 22),
+                  Icon(Icons.waves_rounded, color: Colors.cyanAccent, size: 22),
                 ],
               );
             }
 
-            Widget _buildWidgetPageLayout() {
+            // صفحه ویجت مرکزی دقیقاً مطابق با تصویر نهایی پروژه (شات 1000082585)
+            Widget _buildUnifiedMainScreen() {
               return Padding(
-                padding: const EdgeInsets.all(24.0),
+                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
                 child: Center(
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(28),
+                    borderRadius: BorderRadius.circular(32),
                     child: BackdropFilter(
-                      filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
+                      filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
                       child: Container(
-                        padding: const EdgeInsets.all(24),
+                        padding: const EdgeInsets.all(28),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.06),
-                          borderRadius: BorderRadius.circular(28),
-                          border: Border.all(color: Colors.white.withOpacity(0.12)),
+                          borderRadius: BorderRadius.circular(32),
+                          border: Border.all(color: Colors.white.withOpacity(0.15)),
                         ),
-                        child: const Column(
+                        child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text('09:41', style: TextStyle(fontSize: 64, fontWeight: FontWeight.w300, color: Colors.white, letterSpacing: -1)),
-                            SizedBox(height: 4),
-                            Text('Sunday, June 28, 2026', style: TextStyle(fontSize: 16, color: Colors.white70)),
-                            SizedBox(height: 16),
-                            Divider(color: Colors.white12, height: 1),
-                            SizedBox(height: 16),
-                            Row(
+                            const Text(
+                              '09:41',
+                              style: TextStyle(fontSize: 76, fontWeight: FontWeight.w300, color: Colors.white, letterSpacing: -1),
+                            ),
+                            const SizedBox(height: 2),
+                            const Text(
+                              'Thursday, Jun 25, 2026',
+                              style: TextStyle(fontSize: 17, color: Colors.white70, fontWeight: FontWeight.w400),
+                            ),
+                            const SizedBox(height: 20),
+                            Container(height: 1, color: Colors.white12),
+                            const SizedBox(height: 20),
+                            const Row(
                               mainAxisAlignment: MainAxisAlignment.spaceAround,
                               children: [
                                 Column(
                                   children: [
-                                    Icon(Icons.wb_sunny, color: Colors.orangeAccent, size: 26),
+                                    Icon(Icons.wb_sunny_rounded, color: Colors.orangeAccent, size: 28),
                                     SizedBox(height: 6),
-                                    Text('24°C', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                                    Text('24°C', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
                                   ],
                                 ),
                                 Column(
                                   children: [
-                                    Icon(Icons.bolt, color: Colors.greenAccent, size: 26),
+                                    Icon(Icons.bolt_rounded, color: Colors.greenAccent, size: 28),
                                     SizedBox(height: 6),
-                                    Text('Optimized', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                                    Text('Optimized', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
                                   ],
                                 ),
                               ],
@@ -408,20 +413,17 @@ jobs:
               );
             }
 
+            // لود داینامیک تمام نرم‌افزارهای گوشی شما با افکت نئونی ژله‌ای
             Widget _buildProductionAppGrid() {
               if (_isLoadingApps) {
                 return const Center(child: CircularProgressIndicator(color: Colors.white));
               }
-              if (_installedApps.isEmpty) {
-                return const Center(child: Text('No applications found. Check permissions.'));
-              }
-
               return GridView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 itemCount: _installedApps.length,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 4,
-                  mainAxisSpacing: 20,
+                  mainAxisSpacing: 22,
                   crossAxisSpacing: 16,
                   childAspectRatio: 0.82,
                 ),
@@ -436,16 +438,21 @@ jobs:
                           width: 58,
                           height: 58,
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(15),
+                            borderRadius: BorderRadius.circular(16),
                             boxShadow: [
-                              BoxShadow(color: Colors.black.withOpacity(0.25), blurRadius: 8, offset: const Offset(0, 3))
+                              // سایه نئونی درخشان زیر پوست آیکون بر اساس سبک Liquid Glass Foundations
+                              BoxShadow(
+                                color: Colors.cyanAccent.withOpacity(0.15),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              )
                             ],
                           ),
                           child: ClipRRect(
-                            borderRadius: BorderRadius.circular(15),
+                            borderRadius: BorderRadius.circular(16),
                             child: app is ApplicationWithIcon 
                               ? Image.memory(app.icon, fit: BoxFit.cover)
-                              : const Icon(Icons.android, size: 32, color: Colors.green),
+                              : const Icon(Icons.android, size: 32, color: Colors.white),
                           ),
                         ),
                         const SizedBox(height: 6),
@@ -464,20 +471,23 @@ jobs:
             }
 
             List<Widget> _buildStaticDockIcons() {
-              final Map<IconData, Color> dockIcons = {
-                Icons.phone: Colors.green,
-                Icons.message: Colors.lightBlue,
-                Icons.language: Colors.blueAccent,
-                Icons.chat_bubble: Colors.teal,
-              };
+              final List<MapEntry<IconData, Color>> dockData = [
+                const MapEntry(Icons.phone_rounded, Colors.green),
+                const MapEntry(Icons.message_rounded, Colors.lightBlue),
+                const MapEntry(Icons.language_rounded, Colors.blueAccent),
+                const MapEntry(Icons.chat_bubble_rounded, Colors.teal),
+              ];
 
-              return dockIcons.entries.map((entry) {
+              return dockData.map((entry) {
                 return Container(
                   width: 56,
                   height: 56,
                   decoration: BoxDecoration(
                     color: entry.value.withOpacity(0.85),
                     borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(color: entry.value.withOpacity(0.3), blurRadius: 10, offset: const Offset(0, 3))
+                    ]
                   ),
                   child: Icon(entry.key, color: Colors.white, size: 26),
                 );
@@ -487,20 +497,20 @@ jobs:
             Widget _buildControlCenterWidget() {
               return ClipRRect(
                 child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 35, sigmaY: 35),
+                  filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
                   child: Container(
-                    color: Colors.black.withOpacity(0.6),
-                    padding: const EdgeInsets.fromLTRB(24, 60, 24, 30),
+                    color: Colors.black.withOpacity(0.55),
+                    padding: const EdgeInsets.fromLTRB(24, 65, 24, 30),
                     child: Column(
                       children: [
                         Row(
                           children: [
                             Expanded(
                               child: Container(
-                                height: 135,
+                                height: 140,
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.08),
-                                  borderRadius: BorderRadius.circular(20),
+                                  color: Colors.white.withOpacity(0.07),
+                                  borderRadius: BorderRadius.circular(22),
                                   border: Border.all(color: Colors.white.withOpacity(0.1)),
                                 ),
                                 padding: const EdgeInsets.all(12),
@@ -510,10 +520,10 @@ jobs:
                                   crossAxisSpacing: 10,
                                   physics: const NeverScrollableScrollPhysics(),
                                   children: [
-                                    _ccToggleIcon(Icons.wifi, Colors.blue, true),
-                                    _ccToggleIcon(Icons.bluetooth, Colors.blue, true),
-                                    _ccToggleIcon(Icons.flight, Colors.orange, false),
-                                    _ccToggleIcon(Icons.signal_cellular_alt, Colors.green, true),
+                                    _ccToggleIcon(Icons.wifi_rounded, Colors.blue, true),
+                                    _ccToggleIcon(Icons.bluetooth_rounded, Colors.blue, true),
+                                    _ccToggleIcon(Icons.flight_rounded, Colors.orange, false),
+                                    _ccToggleIcon(Icons.signal_cellular_alt_rounded, Colors.green, true),
                                   ],
                                 ),
                               ),
@@ -521,24 +531,24 @@ jobs:
                             const SizedBox(width: 16),
                             Expanded(
                               child: Container(
-                                height: 135,
+                                height: 140,
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.08),
-                                  borderRadius: BorderRadius.circular(20),
+                                  color: Colors.white.withOpacity(0.07),
+                                  borderRadius: BorderRadius.circular(22),
                                   border: Border.all(color: Colors.white.withOpacity(0.1)),
                                 ),
                                 padding: const EdgeInsets.all(16),
                                 child: const Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text('Media Control', style: TextStyle(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.bold)),
+                                    Text('Media Player', style: TextStyle(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.bold)),
                                     Spacer(),
                                     Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      mainAxisAlignment: Main=\nt.spaceEvenly,
                                       children: [
-                                        Icon(Icons.skip_previous, size: 24),
-                                        Icon(Icons.play_arrow, size: 30),
-                                        Icon(Icons.skip_next, size: 24),
+                                        Icon(Icons.skip_previous_rounded, size: 26, color: Colors.white),
+                                        Icon(Icons.play_arrow_rounded, size: 32, color: Colors.white),
+                                        Icon(Icons.skip_next_rounded, size: 26, color: Colors.white),
                                       ],
                                     ),
                                     Spacer(),
@@ -554,9 +564,9 @@ jobs:
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Text('Close Control Panel', style: TextStyle(color: Colors.white30, fontSize: 12)),
+                              const Text('Close Menu', style: TextStyle(color: Colors.white30, fontSize: 13)),
                               const SizedBox(height: 8),
-                              Container(width: 60, height: 5, decoration: BoxDecoration(color: Colors.white30, borderRadius: BorderRadius.circular(2.5))),
+                              Container(width: 65, height: 5, decoration: BoxDecoration(color: Colors.white38, borderRadius: BorderRadius.circular(2.5))),
                             ],
                           ),
                         ),
@@ -582,10 +592,10 @@ jobs:
       - name: Build Application Binary APK
         run: flutter build apk --release
 
-      - name: Create Production Release Target
+      - name: Create Production Release Target via Node 24 Action
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: "v1.1.${{ github.run_number }}"
+          tag_name: "v1.2.${{ github.run_number }}"
           name: "iOS Launcher Liquid Glass Production Build"
           files: build/app/outputs/flutter-apk/app-release.apk
         env:
