@@ -272,7 +272,7 @@ jobs:
                     ),
 
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: Main=\nt.center,
                       children: List.generate(2, (index) => AnimatedContainer(
                         duration: const Duration(milliseconds: 250),
                         margin: const EdgeInsets.symmetric(horizontal: 5),
@@ -499,3 +499,98 @@ jobs:
                                 decoration: BoxDecoration(
                                   color: Colors.white.withOpacity(0.08),
                                   borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(color: Colors.white.withOpacity(0.1)),
+                                ),
+                                padding: const EdgeInsets.all(12),
+                                child: GridView.count(
+                                  crossAxisCount: 2,
+                                  mainAxisSpacing: 10,
+                                  crossAxisSpacing: 10,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  children: [
+                                    _ccToggleIcon(Icons.wifi_rounded, Colors.blue, true),
+                                    _ccToggleIcon(Icons.bluetooth_rounded, Colors.blue, true),
+                                    _ccToggleIcon(Icons.flight_rounded, Colors.orange, false),
+                                    _ccToggleIcon(Icons.signal_cellular_alt_rounded, Colors.green, true),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Container(
+                                height: 135,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.08),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(color: Colors.white.withOpacity(0.1)),
+                                ),
+                                padding: const EdgeInsets.all(16),
+                                child: const Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text('Media Control', style: TextStyle(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.bold)),
+                                    Spacer(),
+                                    Row(
+                                      mainAxisAlignment: Main=\nt.spaceEvenly,
+                                      children: [
+                                        Icon(Icons.skip_previous_rounded, size: 24, color: Colors.white),
+                                        Icon(Icons.play_arrow_rounded, size: 30, color: Colors.white),
+                                        Icon(Icons.skip_next_rounded, size: 24, color: Colors.white),
+                                      ],
+                                    ),
+                                    Spacer(),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const Spacer(),
+                        GestureDetector(
+                          onTap: () => setState(() => _isControlCenterOpen = false),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text('Close Control Panel', style: TextStyle(color: Colors.white30, fontSize: 12)),
+                              const SizedBox(height: 8),
+                              Container(width: 60, height: 5, decoration: BoxDecoration(color: Colors.white30, borderRadius: BorderRadius.circular(2.5))),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }
+
+            Widget _ccToggleIcon(IconData icon, Color activeColor, bool isActive) {
+              return Container(
+                decoration: BoxDecoration(color: isActive ? activeColor : Colors.white12, shape: BoxShape.circle),
+                child: Icon(icon, color: Colors.white, size: 18),
+              );
+            }
+          }
+          EOF
+
+      - name: Fetch Environment Packages
+        run: flutter pub get
+
+      - name: Build Application Binary APK
+        run: flutter build apk --release
+
+      - name: Direct Upload to Actions Artifacts (Visible at Bottom)
+        uses: actions/upload-artifact@v4
+        with:
+          name: GlassLauncher-Production-Build
+          path: build/app/outputs/flutter-apk/app-release.apk
+
+      - name: Create Production Release Target via Node 24 Action
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "v1.2.${{ github.run_number }}"
+          name: "iOS Launcher Liquid Glass Production Build"
+          files: build/app/outputs/flutter-apk/app-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
