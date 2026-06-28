@@ -6,7 +6,6 @@ on:
       - main
   workflow_dispatch:
 
-# اعطای دسترسی‌های لازم به توکن گیت‌هاب برای حل قطعی خطای 403 Resource not accessible
 permissions:
   contents: write
   packages: write
@@ -139,7 +138,6 @@ jobs:
               return Scaffold(
                 body: Stack(
                   children: [
-                    // والپیپر گرادیان نئونی تیره - کاملاً منطبق با سبک Liquid Glass Foundation
                     Positioned.fill(
                       child: Container(
                         decoration: const BoxDecoration(
@@ -157,10 +155,8 @@ jobs:
                       ),
                     ),
 
-                    // ساختار اصلی صفحات بر اساس شات تایید شده
                     _isLocked ? _buildLockScreen() : _buildMainWorkspace(),
 
-                    // کنترل سنتر کشویی فوق لوکس شیشه‌ای مایع
                     AnimatedPositioned(
                       duration: const Duration(milliseconds: 400),
                       curve: Curves.fastOutSlowIn,
@@ -222,7 +218,6 @@ jobs:
               return SafeArea(
                 child: Column(
                   children: [
-                    // استاتوس بار اختصاصی با قابلیت باز کردن کنترل سنتر با ضربه
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                       child: Row(
@@ -247,7 +242,6 @@ jobs:
                       ),
                     ),
 
-                    // داینامیک آیلند فعال متصل به موزیک پلیر فرضی بر اساس شات لوکس
                     GestureDetector(
                       onTap: () => setState(() => _isIslandExpanded = !_isIslandExpanded),
                       child: AnimatedContainer(
@@ -266,19 +260,17 @@ jobs:
                     ),
                     const SizedBox(height: 12),
 
-                    // پیاده‌سازی سیستم چند صفحه‌ای شامل صفحه ویجت تایید شده و صفحه کل برنامه‌ها
                     Expanded(
                       child: PageView(
                         controller: _pageController,
                         onPageChanged: (int page) => setState(() => _currentPage = page),
                         children: [
-                          _buildUnifiedMainScreen(), // صفحه تلفیقی ویجت بزرگ لوکس (شات ارسالی شما)
-                          _buildProductionAppGrid(),  // صفحه آیکون برنامه‌های واقعی گوشی شما
+                          _buildUnifiedMainScreen(), 
+                          _buildProductionAppGrid(),  
                         ],
                       ),
                     ),
 
-                    // نشانگر نقاط صفحات سفارشی شده
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(2, (index) => AnimatedContainer(
@@ -294,7 +286,6 @@ jobs:
                     ),
                     const SizedBox(height: 12),
 
-                    // داک شیشه‌ای مایع مایع (Liquid Glass Dock) پایین صفحه با بلر غلیظ
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       child: ClipRRect(
@@ -354,7 +345,6 @@ jobs:
               );
             }
 
-            // صفحه ویجت مرکزی دقیقاً مطابق با تصویر نهایی پروژه (شات 1000082585)
             Widget _buildUnifiedMainScreen() {
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
@@ -413,7 +403,6 @@ jobs:
               );
             }
 
-            // لود داینامیک تمام نرم‌افزارهای گوشی شما با افکت نئونی ژله‌ای
             Widget _buildProductionAppGrid() {
               if (_isLoadingApps) {
                 return const Center(child: CircularProgressIndicator(color: Colors.white));
@@ -440,7 +429,6 @@ jobs:
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
-                              // سایه نئونی درخشان زیر پوست آیکون بر اساس سبک Liquid Glass Foundations
                               BoxShadow(
                                 color: Colors.cyanAccent.withOpacity(0.15),
                                 blurRadius: 12,
@@ -497,106 +485,17 @@ jobs:
             Widget _buildControlCenterWidget() {
               return ClipRRect(
                 child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+                  filter: ImageFilter.blur(sigmaX: 35, sigmaY: 35),
                   child: Container(
-                    color: Colors.black.withOpacity(0.55),
-                    padding: const EdgeInsets.fromLTRB(24, 65, 24, 30),
+                    color: Colors.black.withOpacity(0.6),
+                    padding: const EdgeInsets.fromLTRB(24, 60, 24, 30),
                     child: Column(
                       children: [
                         Row(
                           children: [
                             Expanded(
                               child: Container(
-                                height: 140,
+                                height: 135,
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.07),
-                                  borderRadius: BorderRadius.circular(22),
-                                  border: Border.all(color: Colors.white.withOpacity(0.1)),
-                                ),
-                                padding: const EdgeInsets.all(12),
-                                child: GridView.count(
-                                  crossAxisCount: 2,
-                                  mainAxisSpacing: 10,
-                                  crossAxisSpacing: 10,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  children: [
-                                    _ccToggleIcon(Icons.wifi_rounded, Colors.blue, true),
-                                    _ccToggleIcon(Icons.bluetooth_rounded, Colors.blue, true),
-                                    _ccToggleIcon(Icons.flight_rounded, Colors.orange, false),
-                                    _ccToggleIcon(Icons.signal_cellular_alt_rounded, Colors.green, true),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Container(
-                                height: 140,
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.07),
-                                  borderRadius: BorderRadius.circular(22),
-                                  border: Border.all(color: Colors.white.withOpacity(0.1)),
-                                ),
-                                padding: const EdgeInsets.all(16),
-                                child: const Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text('Media Player', style: TextStyle(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.bold)),
-                                    Spacer(),
-                                    Row(
-                                      mainAxisAlignment: Main=\nt.spaceEvenly,
-                                      children: [
-                                        Icon(Icons.skip_previous_rounded, size: 26, color: Colors.white),
-                                        Icon(Icons.play_arrow_rounded, size: 32, color: Colors.white),
-                                        Icon(Icons.skip_next_rounded, size: 26, color: Colors.white),
-                                      ],
-                                    ),
-                                    Spacer(),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const Spacer(),
-                        GestureDetector(
-                          onTap: () => setState(() => _isControlCenterOpen = false),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Text('Close Menu', style: TextStyle(color: Colors.white30, fontSize: 13)),
-                              const SizedBox(height: 8),
-                              Container(width: 65, height: 5, decoration: BoxDecoration(color: Colors.white38, borderRadius: BorderRadius.circular(2.5))),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            }
-
-            Widget _ccToggleIcon(IconData icon, Color activeColor, bool isActive) {
-              return Container(
-                decoration: BoxDecoration(color: isActive ? activeColor : Colors.white12, shape: BoxShape.circle),
-                child: Icon(icon, color: Colors.white, size: 18),
-              );
-            }
-          }
-          EOF
-
-      - name: Fetch Environment Packages
-        run: flutter pub get
-
-      - name: Build Application Binary APK
-        run: flutter build apk --release
-
-      - name: Create Production Release Target via Node 24 Action
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: "v1.2.${{ github.run_number }}"
-          name: "iOS Launcher Liquid Glass Production Build"
-          files: build/app/outputs/flutter-apk/app-release.apk
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                                  color: Colors.white.withOpacity(0.08),
+                                  borderRadius: BorderRadius.circular(20),
