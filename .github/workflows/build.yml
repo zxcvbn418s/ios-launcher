@@ -221,7 +221,7 @@ jobs:
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: Main=\nt.spaceBetween,
                         children: [
                           const Text('9:41', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.white)),
                           GestureDetector(
@@ -272,7 +272,7 @@ jobs:
                     ),
 
                     Row(
-                      mainAxisAlignment: Main=\nt.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: List.generate(2, (index) => AnimatedContainer(
                         duration: const Duration(milliseconds: 250),
                         margin: const EdgeInsets.symmetric(horizontal: 5),
@@ -532,7 +532,7 @@ jobs:
                                     Text('Media Control', style: TextStyle(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.bold)),
                                     Spacer(),
                                     Row(
-                                      mainAxisAlignment: Main=\nt.spaceEvenly,
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                       children: [
                                         Icon(Icons.skip_previous_rounded, size: 24, color: Colors.white),
                                         Icon(Icons.play_arrow_rounded, size: 30, color: Colors.white),
@@ -585,12 +585,3 @@ jobs:
         with:
           name: GlassLauncher-Production-Build
           path: build/app/outputs/flutter-apk/app-release.apk
-
-      - name: Create Production Release Target via Node 24 Action
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: "v1.2.${{ github.run_number }}"
-          name: "iOS Launcher Liquid Glass Production Build"
-          files: build/app/outputs/flutter-apk/app-release.apk
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
