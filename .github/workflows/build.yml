@@ -25,9 +25,11 @@ jobs:
           flutter-version: '3.22.0'
           channel: 'stable'
 
-      - name: Create Flutter Structure If Not Exists
+      - name: Force Clean and Recreate Modern Android Structure
         run: |
-          # فلاتر ساختارهای اندروید را بر اساس فایل‌های کدی که نوشتیم ایجاد می‌کند
+          # پاک کردن پوشه قدیمی اندروید برای حذف کامل v1 embedding
+          rm -rf android
+          # ساخت مجدد پوشه اندروید با ساختار کاملاً مدرن و v2
           flutter create --platforms android --org com.example.ioslauncher --project-name ios_launcher .
 
       - name: Fetch Packages
