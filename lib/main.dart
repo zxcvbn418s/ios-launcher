@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'home_screen.dart';
+import 'launcher/home_screen.dart';
+import 'launcher/lock_screen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const IOSLauncherApp());
 }
 
@@ -11,94 +13,161 @@ class IOSLauncherApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: 'iOS 26 Launcher',
       debugShowCheckedModeBanner: false,
-      title: 'iOS Launcher Liquid Glass',
       theme: ThemeData(
         brightness: Brightness.dark,
-        scaffoldBackgroundColor: Colors.black,
         useMaterial3: true,
+        fontFamily: 'Roboto',
+        scaffoldBackgroundColor: Colors.black,
       ),
-      home: const MainContainer(),
+      home: const LauncherRoot(),
     );
   }
 }
 
-class MainContainer extends StatefulWidget {
-  const MainContainer({super.key});
+class LauncherRoot extends StatefulWidget {
+  const LauncherRoot({super.key});
 
   @override
-  State<MainContainer> createState() => _MainContainerState();
+  State<LauncherRoot> createState() => _LauncherRootState();
 }
 
-class _MainContainerState extends State<MainContainer> {
-  bool isLocked = true;
+class _LauncherRootState extends State<LauncherRoot> {
+  bool locked = true;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          // والپیپر تاریک نئونی و باکیفیت برای جلوه بهتر شیشه‌ها
-          Positioned.fill(
-            child: Image.network(
-              'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe',
-              fit: BoxFit.cover,
-            ),
-          ),
-          isLocked
-              ? LockScreen(onUnlock: () => setState(() => isLocked = false))
-              : const HomeScreen(),
+          const _LauncherWallpaper(),
+          if (locked)
+            LockScreen(
+              onUnlock: () {
+                setState(() {
+                  locked = false;
+                });
+              },
+            )
+          else
+            const HomeScreen(),
         ],
       ),
     );
   }
 }
 
-class LockScreen extends StatelessWidget {
-  final VoidCallback onUnlock;
-  const LockScreen({super.key, required this.onUnlock});
+class _LauncherWallpaper extends StatelessWidget {
+  const _LauncherWallpaper();
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.black.withOpacity(0.3),
-      child: SafeArea(
-        child: Column(
-          children: [
-            const SizedBox(height: 60),
-            const Icon(Icons.lock_outline, color: Colors.white, size: 30),
-            const SizedBox(height: 16),
-            const Text(
-              '09:41',
-              style: TextStyle(fontSize: 84, fontWeight: FontWeight.w200, color: Colors.white, letterSpacing: -2),
-            ),
-            const Text(
-              'Sunday, June 28',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w400, color: Colors.white70),
-            ),
-            const Spacer(),
-            GestureDetector(
-              onTap: onUnlock,
-              child: Container(
-                margin: const EdgeInsets.only(bottom: 60),
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.08),
-                  borderRadius: BorderRadius.circular(32),
-                  border: Border.all(color: Colors.white12),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text('Tap to Unlock ', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
-                    Icon(Icons.arrow_forward_ios, color: Colors.white, size: 14),
-                  ],
-                ),
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: DecoratedBox(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFFDAF7FF),
+                  Color(0xFF192F45),
+                  Color(0xFF080C18),
+                ],
               ),
+            ),
+          ),
+        ),
+        Positioned(
+          left: -80,
+          top: 40,
+          child: _GlowCircle(
+            size: 280,
+            color: Color(0x99FFFFFF),
+          ),
+        ),
+        Positioned(
+          right: -110,
+          top: 140,
+          child: _GlowCircle(
+            size: 320,
+            color: Color(0x6634E6FF),
+          ),
+        ),
+        Positioned(
+          left: 40,
+          bottom: 60,
+          child: _GlowCircle(
+            size: 260,
+            color: Color(0x66A855FF),
+          ),
+        ),
+        Positioned.fill(
+          child: CustomPaint(
+            painter: _GlassPatternPainter(),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _GlowCircle extends StatelessWidget {
+  final double size;
+  final Color color;
+
+  const _GlowCircle({
+    required this.size,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return IgnorePointer(
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: color,
+              blurRadius: 90,
+              spreadRadius: 40,
             ),
           ],
         ),
       ),
     );
   }
+}
+
+class _GlassPatternPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final linePaint = Paint()
+      ..color = Colors.white.withOpacity(0.045)
+      ..strokeWidth = 1;
+
+    for (double i = -size.height; i < size.width; i += 58) {
+      canvas.drawLine(
+        Offset(i, 0),
+        Offset(i + size.height, size.height),
+        linePaint,
+      );
+    }
+
+    for (double i = 0; i < size.width + size.height; i += 74) {
+      canvas.drawLine(
+        Offset(i, 0),
+        Offset(i - size.height, size.height),
+        linePaint,
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
