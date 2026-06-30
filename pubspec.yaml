@@ -1,7 +1,8 @@
 name: ios_launcher
-description: "A beautiful Liquid Glass iOS Launcher built with Flutter in 2026."
+description: "A Liquid Glass iOS 26 inspired Android Launcher built with Flutter."
 publish_to: 'none'
-version: 1.0.1+8
+
+version: 1.0.2+9
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
@@ -10,6 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
+  shared_preferences: ^2.2.3
 
 dev_dependencies:
   flutter_test:
